@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2018",
+    "noEmit": true
+  },
+  "references": [
+    { "path": "../packages/core/tsconfig.next.json" },
+    { "path": "../packages/hooks/tsconfig.next.json" },
+    { "path": "../packages/immer/tsconfig.next.json" },
+    { "path": "../packages/react/tsconfig.next.json" },
+    { "path": "../packages/test/tsconfig.next.json" },
+    { "path": "../packages/next.js/tsconfig.next.json" }
+  ]
+}

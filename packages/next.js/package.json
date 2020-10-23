@@ -1,0 +1,28 @@
+{
+  "name": "@pure-model/next.js",
+  "version": "0.0.0",
+  "description": "Next.js adapter for pure-model",
+  "main": "dist/index.js",
+  "module": "esm/index.js",
+  "esnext": "next/index.js",
+  "types": "esm/index.d.ts",
+  "author": "Jade Gu",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "next": "^9.5.5",
+    "@pure-model/core": "^0.0.0",
+    "@pure-model/react": "^0.0.0"
+  },
+  "devDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "next": "^9.5.5",
+    "@pure-model/core": "^0.0.0",
+    "@pure-model/react": "^0.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.0.3"
+  }
+}
