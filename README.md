@@ -55,7 +55,7 @@ npm install --save @pure-model/core @pure-model/react @pure-model/next.js @pure-
     - [Provider](#provider-组件)
     - [preload](#preload-model-context-preloadedstate-)
     - [useReactModel](#usereactmodelreactmodel-options)
-  - [Next.js 框架适配 API](#next.js-框架适配-api)
+  - [Next.js 框架适配 API](#nextjs-框架适配-api)
   - [immer 适配 API](#immer-适配)
   - [http 接口请求 API](#http-接口请求-api)
   - [测试辅助套件 API](#测试辅助套件-api)
@@ -312,15 +312,15 @@ export default provide({ TestModel })(MyComponent)
 
 `@pure-model/next.js` 提供了对 `next.js` 框架的适配 API
 
-```typescript
-// 引入 page 函数
-import { page } from '@pure-model/next.js'
-
 page options 参数如下：
 
 - `Models` 对象类型，value 为 `ReactModel`
 - `contexts` 数组类型，value 为 `ModelContextValue`，通过 `Context.create(value)` 创建
 - `preload` 方法函数，接受两个参数 `models` 实例对象 和 `ctx` 上下文对象，可以在这里进行数据同步
+
+```typescript
+// 引入 page 函数
+import { page } from '@pure-model/next.js'
 
 // 引入页面依赖的 Models 模块
 import LayoutModel from '../../models/LayoutModel'
@@ -343,8 +343,8 @@ const Page = page({
    */
   contexts: [
     EnvContext.create({
-      env: 'prod'
-    })
+      env: 'prod',
+    }),
   ],
 
   /**
@@ -374,7 +374,6 @@ const Page = page({
 
 // 用 Page 包裹 View 创建一个 NextPage 组件
 export default Page(View)
-
 ```
 
 ## API 介绍
@@ -411,7 +410,12 @@ import {
   // 订阅 model store 内部的 state 状态
   subscribe,
   // 订阅 model store 内部的部分 state 状态
-  select
+  select,
+
+  // http 相关 api
+  setupFetch,
+  setupGetJSON,
+  setupPostJSON,
 } from '@pure-model/core'
 
 // react 组件适配 api
@@ -427,6 +431,11 @@ import {
   // 在单个组件内使用 react-model 的 api
   useReactModel,
 } from '@pure-model/react'
+
+// next.js 框架适配 api
+import {
+  page
+} from '@pure-model/next.js'
 
 // immer 适配 api
 import {
