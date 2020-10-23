@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/immer",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Immer adapter for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -9,7 +9,7 @@
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {
-    "tslib": "^2.0.3",
-    "immer": "^6.0.9"
+    "immer": "^6.0.9",
+    "tslib": "^2.0.3"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/react",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "React adapter for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -9,14 +9,14 @@
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
+    "@pure-model/core": "^0.0.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "@pure-model/core": "^0.0.0"
+    "react-dom": "^16.14.0"
   },
   "devDependencies": {
+    "@pure-model/core": "^1.0.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "@pure-model/core": "^0.0.0"
+    "react-dom": "^16.14.0"
   },
   "dependencies": {
     "tslib": "^2.0.3"
