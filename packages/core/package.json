@@ -19,5 +19,6 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "tslib": "^2.0.3"
-  }
+  },
+  "gitHead": "da1747eb924cfa6786d1c40434664ff7bbbe26dc"
 }

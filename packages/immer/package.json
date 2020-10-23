@@ -11,5 +11,6 @@
   "dependencies": {
     "immer": "^6.0.9",
     "tslib": "^2.0.3"
-  }
+  },
+  "gitHead": "da1747eb924cfa6786d1c40434664ff7bbbe26dc"
 }
