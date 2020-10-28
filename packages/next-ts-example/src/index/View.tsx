@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Link from 'next/link'
 
 import { useScrollToBottom } from '../../react-hooks/useScrollToBottom'
@@ -12,18 +12,12 @@ export default function View() {
   let topics = IndexModel.useState((state) => state.topics)
   let showMenu = LayoutModel.useState((state) => state.showMenu)
 
-  let layoutActions = LayoutModel.useActions()
-
   let actions = IndexModel.useActions()
 
   useScrollToBottom(async () => {
     if (showMenu) return
     await actions.getNextTopics()
   })
-
-  useEffect(() => {
-    layoutActions.openMenu()
-  }, [topics])
 
   return (
     <Layout>

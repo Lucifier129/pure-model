@@ -3,6 +3,7 @@
  */
 import { setupStore, setupPreloadCallback } from '@pure-model/core'
 import { createReactModel } from '@pure-model/react'
+import { setupPageContext } from '@pure-model/next.js'
 
 import { setupGetJSON } from '../../model-hooks/http'
 
@@ -117,7 +118,25 @@ export default createReactModel(() => {
     actions.addTopics(topics)
   }
 
+  let ctx = setupPageContext()
+
+  let initSearchParams = () => {
+    if (!ctx) return
+
+    let tab = 'all'
+    if (Array.isArray(ctx.query.tab)) {
+      tab = ctx.query.tab.join('')
+    } else if (ctx.query.tab) {
+      tab = ctx.query.tab
+    }
+
+    actions.setSearchParams({
+      tab: tab,
+    })
+  }
+
   setupPreloadCallback(async () => {
+    initSearchParams()
     await getCurrentTopics()
   })
 

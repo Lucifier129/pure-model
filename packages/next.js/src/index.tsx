@@ -1,6 +1,14 @@
 import React, { useMemo } from 'react'
 
-import { ModelContextValue, EnvContext, mergeModelContext, createPureModel, Initializer } from '@pure-model/core'
+import {
+  ModelContextValue,
+  EnvContext,
+  mergeModelContext,
+  createPureModel,
+  Initializer,
+  createModelContext,
+  setupContext,
+} from '@pure-model/core'
 
 import { Provider, ReactModels, ReactModelInitilizer } from '@pure-model/react'
 
@@ -14,6 +22,13 @@ export type PageOptions<T extends ReactModels> = {
   Models: T
   preload?: (models: PageModels<T>, ctx: NextPageContext) => Promise<void>
   contexts?: ModelContextValue[]
+}
+
+export const PageContext = createModelContext<NextPageContext | null>(null)
+
+export const setupPageContext = () => {
+  let ctx = setupContext(PageContext)
+  return ctx
 }
 
 export const page = <T extends ReactModels>(options: PageOptions<T>) => {
@@ -54,12 +69,14 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
     Page.getInitialProps = async (ctx: NextPageContext) => {
       let initialProps = await InputComponent.getInitialProps?.(ctx)
 
-      let env = EnvContext.create({
-        req: ctx.req,
-        res: ctx.res,
-      })
-
-      let context = mergeModelContext(env, fixedContext)
+      let context = mergeModelContext(
+        fixedContext,
+        PageContext.create(ctx),
+        EnvContext.create({
+          req: ctx.req,
+          res: ctx.res,
+        }),
+      )
 
       let modelList = Object.values(options.Models).map((Model) => {
         return createPureModel(Model.create as Initializer, {

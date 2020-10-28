@@ -18,19 +18,19 @@ export default function Menu() {
     <section id="sideBar" className={className} onClick={() => actions.closeMenu()}>
       <UserInfoUI />
       <ul className="list-ul">
-        <MenuItem className="icon-quanbu iconfont" to={`/index?tab=all`}>
+        <MenuItem className="icon-quanbu iconfont" to={`/?tab=all`}>
           全部
         </MenuItem>
-        <MenuItem className="icon-hao iconfont" to={`/index?tab=good`}>
+        <MenuItem className="icon-hao iconfont" to={`/?tab=good`}>
           精华
         </MenuItem>
-        <MenuItem className="icon-fenxiang iconfont" to={`/index?tab=share`}>
+        <MenuItem className="icon-fenxiang iconfont" to={`/?tab=share`}>
           分享
         </MenuItem>
-        <MenuItem className="icon-wenda iconfont" to={`/index?tab=ask`}>
+        <MenuItem className="icon-wenda iconfont" to={`/?tab=ask`}>
           问答
         </MenuItem>
-        <MenuItem className="icon-zhaopin iconfont" to={`/index?tab=job`}>
+        <MenuItem className="icon-zhaopin iconfont" to={`/?tab=job`}>
           招聘
         </MenuItem>
         <MenuItem className="icon-xiaoxi iconfont line" to={`/message`}>
