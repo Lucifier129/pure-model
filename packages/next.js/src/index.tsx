@@ -18,10 +18,15 @@ export type PageModels<T extends ReactModels> = {
   [key in keyof T]: ReturnType<ReactModelInitilizer<T[key]>>
 }
 
+export type GetContextsOptions = {
+  ctx?: NextPageContext
+  getInitialProps: boolean
+}
+
 export type PageOptions<T extends ReactModels> = {
   Models: T
   preload?: (models: PageModels<T>, ctx: NextPageContext) => Promise<void>
-  contexts?: ModelContextValue[]
+  contexts?: ModelContextValue[] | ((options: GetContextsOptions) => ModelContextValue[])
 }
 
 export const PageContext = createModelContext<NextPageContext | null>(null)
@@ -32,8 +37,19 @@ export const setupPageContext = () => {
 }
 
 export const page = <T extends ReactModels>(options: PageOptions<T>) => {
-  let fixedContext = mergeModelContext(...(options.contexts ?? []))
   let uid = 0
+
+  let getOptionContexts = (contextsOptions: GetContextsOptions) => {
+    if (!options.contexts) return mergeModelContext()
+
+    if (Array.isArray(options.contexts)) {
+      return mergeModelContext(...options.contexts)
+    }
+
+    let contexts = options.contexts(contextsOptions)
+
+    return mergeModelContext(...contexts)
+  }
 
   return function <Props = {}, InitialProps = Props>(InputComponent: NextPage<Props, InitialProps>) {
     type PageInitialProps = InitialProps & {
@@ -42,12 +58,17 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
 
     const Page = (props: PageInitialProps) => {
       let { __STATE_LIST__, ...rest } = props
+
       let ReactModelArgs = useMemo(() => {
         return Object.values(options.Models).map((Model, index) => {
           let preloadedState = __STATE_LIST__?.[index]
+          let optionContexts = getOptionContexts({
+            getInitialProps: false,
+          })
+
           return {
             Model,
-            context: fixedContext,
+            context: optionContexts,
             preloadedState,
           }
         })
@@ -69,8 +90,13 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
     Page.getInitialProps = async (ctx: NextPageContext) => {
       let initialProps = await InputComponent.getInitialProps?.(ctx)
 
+      let optionContexts = getOptionContexts({
+        ctx,
+        getInitialProps: true,
+      })
+
       let context = mergeModelContext(
-        fixedContext,
+        optionContexts,
         PageContext.create(ctx),
         EnvContext.create({
           req: ctx.req,

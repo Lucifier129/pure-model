@@ -6,6 +6,7 @@ import { createReactModel } from '@pure-model/react'
 import { setupPageContext } from '@pure-model/next.js'
 
 import { setupGetJSON } from '../../model-hooks/http'
+import { setupCtrl } from '../../model-contexts/CtrlContext'
 
 export type Topic = {
   id: string
@@ -90,6 +91,7 @@ export default createReactModel(() => {
     },
   })
 
+  let ctrl = setupCtrl()
   let getJSON = setupGetJSON()
 
   let getTopics = async (searchParams: SearchParams) => {
@@ -135,15 +137,18 @@ export default createReactModel(() => {
     })
   }
 
-  setupPreloadCallback(async () => {
-    initSearchParams()
-    await getCurrentTopics()
-  })
+  console.log('ctrl', ctrl)
+
+  // setupPreloadCallback(async () => {
+  //   initSearchParams()
+  //   await getCurrentTopics()
+  // })
 
   return {
     store,
     actions: {
       ...actions,
+      ctrl,
       getCurrentTopics,
       getNextTopics,
     },
