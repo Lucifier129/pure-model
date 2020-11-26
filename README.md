@@ -315,7 +315,12 @@ export default provide({ TestModel })(MyComponent)
 page options 参数如下：
 
 - `Models` 对象类型，value 为 `ReactModel`
-- `contexts` 数组类型，value 为 `ModelContextValue`，通过 `Context.create(value)` 创建
+- `contexts` 接受一下类型的参数：
+  - 数组类型，value 为 `ModelContextValue`，通过 `Context.create(value)` 创建
+  - 函数类型，接受一个 `options` 参数，包含 `{ ctx?, isServer, getInitialProps }`，返回 `ModelContextValue` 数组
+    - `ctx` 为 `NextPageContext` 对象，可能存在，也可能不存在
+    - `getInitialProps` 为 boolean 类型，表示是在 `Page.getInitialProps` 里调用，还是在 `Page` 组件里调用，组件里调用时没有 `ctx` 对象
+    - `isServer` 为 boolean 类型，表示是否在服务端运行
 - `preload` 方法函数，接受两个参数 `models` 实例对象 和 `ctx` 上下文对象，可以在这里进行数据同步
 
 ```typescript
@@ -341,11 +346,18 @@ const Page = page({
    * 可选的 contexts 数组，可以注入 context value
    * 改变 models 内部 setupContext(EnvContext) 获取的 context value
    */
-  contexts: [
-    EnvContext.create({
-      env: 'prod',
-    }),
-  ],
+  contexts: (options) => {
+    let ctx = options.ctx // ctx 为 NextPageContext 对象
+
+    // options.getInitialProps 为 boolean 值，判断是在
+    console.log('getInitialProps', options.getInitialProps)
+
+    return [
+      EnvContext.create({
+        env: 'prod',
+      }),
+    ]
+  },
 
   /**
    * 可选：配置 preload 方法

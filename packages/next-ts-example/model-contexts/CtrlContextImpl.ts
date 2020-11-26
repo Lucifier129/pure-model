@@ -1,12 +1,9 @@
 import { GetContextsOptions } from '@pure-model/next.js'
 import { CtrlContext } from '../model-contexts/CtrlContext'
-
-const isServer = typeof window === 'undefined'
-
 export const implCtrlContext = (options: GetContextsOptions) => {
   return CtrlContext.create({
     redirect: (url) => {
-      if (isServer) {
+      if (options.isServer) {
         let res = options.ctx?.res
         if (!res) return
 

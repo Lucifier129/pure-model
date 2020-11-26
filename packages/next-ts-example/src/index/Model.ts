@@ -1,7 +1,7 @@
 /**
  * Model
  */
-import { setupStore, setupPreloadCallback } from '@pure-model/core'
+import { setupStore, setupPreloadCallback, setupStartCallback } from '@pure-model/core'
 import { createReactModel } from '@pure-model/react'
 import { setupPageContext } from '@pure-model/next.js'
 
@@ -139,10 +139,10 @@ export default createReactModel(() => {
 
   console.log('ctrl', ctrl)
 
-  // setupPreloadCallback(async () => {
-  //   initSearchParams()
-  //   await getCurrentTopics()
-  // })
+  setupStartCallback(async () => {
+    initSearchParams()
+    await getCurrentTopics()
+  })
 
   return {
     store,

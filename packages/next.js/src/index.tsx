@@ -18,8 +18,11 @@ export type PageModels<T extends ReactModels> = {
   [key in keyof T]: ReturnType<ReactModelInitilizer<T[key]>>
 }
 
+const isServer = typeof window === 'undefined'
+
 export type GetContextsOptions = {
   ctx?: NextPageContext
+  isServer: boolean
   getInitialProps: boolean
 }
 
@@ -64,6 +67,7 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
           let preloadedState = __STATE_LIST__?.[index]
           let optionContexts = getOptionContexts({
             getInitialProps: false,
+            isServer,
           })
 
           return {
@@ -93,6 +97,7 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
       let optionContexts = getOptionContexts({
         ctx,
         getInitialProps: true,
+        isServer,
       })
 
       let context = mergeModelContext(
