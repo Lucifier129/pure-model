@@ -261,16 +261,28 @@ export type ProviderProps = {
 }
 
 export const Provider: React.FC<ProviderProps> = ({ list = [], children }) => {
-  for (let i = list.length - 1; i >= 0; i--) {
-    let { Model, context, preloadedState } = list[i]
-    children = (
-      <Model.Provider context={context} preloadedState={preloadedState}>
-        {children}
-      </Model.Provider>
-    )
-  }
+  let [state, setState] = useReactState<{ Provider: React.FC } | null>(null)
 
-  return <>{children}</>
+  useIsomorphicLayoutEffect(() => {
+    let isUnmounted = false
+
+    preload(list).then((result) => {
+      if (isUnmounted) return
+      setState({
+        Provider: result.Provider,
+      })
+    })
+
+    return () => {
+      isUnmounted = true
+    }
+  }, [])
+
+  let Provider = state?.Provider
+
+  if (!Provider) return null
+
+  return <Provider>{children}</Provider>
 }
 
 type CombinedReactModelState<T extends ReactModelArgs[]> = ReactModelState<T[number]['Model']>[]
