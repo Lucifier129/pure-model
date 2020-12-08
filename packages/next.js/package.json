@@ -9,8 +9,8 @@
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
-    "@pure-model/core": "^0.0.0",
-    "@pure-model/react": "^0.0.0",
+    "@pure-model/core": "^1.0.0",
+    "@pure-model/react": "^1.0.0",
     "next": "^9.5.5",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
