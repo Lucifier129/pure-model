@@ -324,7 +324,7 @@ export const preload = async <T extends ReactModelArgs[]>(list: T) => {
 export const useReactModel = <RM extends ReactModel>(
   ReactModel: RM,
   options?: CreatePureModelOptions<ReactModelInitilizer<RM>> & {
-    onError: (error: Error) => any
+    onError?: (error: Error) => any
   },
 ): [InitializerState<ReactModelInitilizer<RM>>, InitializerActions<ReactModelInitilizer<RM>>] => {
   let model = useMemo(() => {
