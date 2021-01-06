@@ -19,7 +19,8 @@
     "format:yml": "prettier --parser yaml --write ./*.{yml,yaml}",
     "test": "jest --config ./configs/jest.config.js",
     "test:coverage": "jest --config ./configs/jest.config.js --collectCoverage",
-    "bootstrap": "lerna bootstrap --hoist"
+    "bootstrap": "lerna bootstrap --hoist",
+    "release": "npm run build & npm run test & lerna publish"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
