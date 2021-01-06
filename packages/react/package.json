@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/react",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "React adapter for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
