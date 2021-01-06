@@ -323,7 +323,9 @@ export const preload = async <T extends ReactModelArgs[]>(list: T) => {
 
 export const useReactModel = <RM extends ReactModel>(
   ReactModel: RM,
-  options?: CreatePureModelOptions<ReactModelInitilizer<RM>>,
+  options?: CreatePureModelOptions<ReactModelInitilizer<RM>> & {
+    onError: (error: Error) => any
+  },
 ): [InitializerState<ReactModelInitilizer<RM>>, InitializerActions<ReactModelInitilizer<RM>>] => {
   let model = useMemo(() => {
     let model = createPureModel(ReactModel.create, options)
@@ -340,11 +342,13 @@ export const useReactModel = <RM extends ReactModel>(
     })
 
     if (!model.isPreloaded()) {
-      // tslint:disable-next-line: no-floating-promises
-      model.preload().then(() => {
-        if (isUnmounted) return
-        model.start()
-      })
+      model
+        .preload()
+        .then(() => {
+          if (isUnmounted) return
+          model.start()
+        })
+        .catch(options?.onError)
     } else if (!model.isStarted()) {
       model.start()
     }
