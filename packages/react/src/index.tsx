@@ -327,7 +327,7 @@ export const useReactModel = <RM extends ReactModel>(
 ): [InitializerState<ReactModelInitilizer<RM>>, InitializerActions<ReactModelInitilizer<RM>>] => {
   let model = useMemo(() => {
     let model = createPureModel(ReactModel.create, options)
-    return model
+    return model as Model
   }, [])
 
   let [state, setState] = useReactState(() => model.store.getState() as InitializerState<ReactModelInitilizer<RM>>)
@@ -335,7 +335,9 @@ export const useReactModel = <RM extends ReactModel>(
   useIsomorphicLayoutEffect(() => {
     let isUnmounted = false
 
-    let unsubscribe = subscribe(model, setState)
+    let unsubscribe = model.store.subscribe(() => {
+      setState(model.store.getState())
+    })
 
     if (!model.isPreloaded()) {
       // tslint:disable-next-line: no-floating-promises
