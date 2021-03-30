@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/react",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "React adapter for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -14,7 +14,7 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@pure-model/core": "^1.2.1",
+    "@pure-model/core": "^1.2.4",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },

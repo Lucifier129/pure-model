@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/test",
-  "version": "1.2.1",
+  "version": "1.2.4",
   "description": "test utils for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -12,7 +12,7 @@
     "@pure-model/core": "^1.0.0"
   },
   "devDependencies": {
-    "@pure-model/core": "^1.2.1"
+    "@pure-model/core": "^1.2.4"
   },
   "dependencies": {
     "tslib": "^2.0.3"
