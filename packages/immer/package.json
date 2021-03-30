@@ -8,8 +8,13 @@
   "types": "esm/index.d.ts",
   "author": "Jade Gu",
   "license": "MIT",
+  "peerDependencies": {
+    "immer": "^9.0.0"
+  },
+  "devDependencies": {
+    "immer": "^9.0.0"
+  },
   "dependencies": {
-    "immer": "^6.0.9",
     "tslib": "^2.0.3"
   }
 }

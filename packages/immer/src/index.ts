@@ -1,4 +1,5 @@
 import produce, { Draft, enableES5 } from 'immer'
+import type { WritableDraft } from 'immer/dist/types/types-external'
 
 if (typeof Proxy !== 'function') enableES5()
 
@@ -6,18 +7,21 @@ type Tail<T extends any[]> = ((...t: T) => any) extends (_: any, ...tail: infer 
 
 export type { Draft }
 
-export type ImmerReducerWithoutPayload<S = any, Return = void> = (state: Draft<S>) => Return
+export type ImmerReducerWithoutPayload<S = any, Return = void> = (state: WritableDraft<S>) => Return
 
-export type ImmerReducerWithPayload<S = any, P = any, Return = void> = (state: Draft<S>, payload: P) => Return
+export type ImmerReducerWithPayload<S = any, P = any, Return = void> = (state: WritableDraft<S>, payload: P) => Return
 
-export type ImmerReducerWithOptionalPayload<S = any, P = any, Return = void> = (state: Draft<S>, payload?: P) => Return
+export type ImmerReducerWithOptionalPayload<S = any, P = any, Return = void> = (
+  state: WritableDraft<S>,
+  payload?: P,
+) => Return
 
 export type ImmerReducer<S = any> =
   | ImmerReducerWithoutPayload<S>
   | ImmerReducerWithPayload<S>
   | ImmerReducerWithOptionalPayload<S>
 
-export type ImmerReducerStateType<R extends ImmerReducer> = R extends ImmerReducer<Draft<infer S>> ? S : never
+export type ImmerReducerStateType<R extends ImmerReducer> = R extends ImmerReducer<WritableDraft<infer S>> ? S : never
 
 export type ImmerReducerArgs<R extends ImmerReducer> = R extends (...args: infer Args) => any ? Args : never
 

@@ -287,128 +287,128 @@ describe('preset', () => {
     expect(await result2).toEqual(3)
   })
 
-  it('should support setupInterval', async () => {
-    let list: number[] = []
-    let info = {
-      data: 0,
-      start: 0,
-      stop: 0,
-      reset: 0,
-    }
-    let model = createPureModel(() => {
-      let { store, actions } = setupCounter()
+  // it('should support setupInterval', async () => {
+  //   let list: number[] = []
+  //   let info = {
+  //     data: 0,
+  //     start: 0,
+  //     stop: 0,
+  //     reset: 0,
+  //   }
+  //   let model = createPureModel(() => {
+  //     let { store, actions } = setupCounter()
 
-      let { start, stop, reset } = setupInterval({
-        onData: (n) => {
-          info.data += 1
-          list.push(n)
-        },
-        onStart: () => {
-          info.start += 1
-        },
-        onStop: () => {
-          info.stop += 1
-        },
-        onReset: () => {
-          info.reset += 1
-        },
-      })
+  //     let { start, stop, reset } = setupInterval({
+  //       onData: (n) => {
+  //         info.data += 1
+  //         list.push(n)
+  //       },
+  //       onStart: () => {
+  //         info.start += 1
+  //       },
+  //       onStop: () => {
+  //         info.stop += 1
+  //       },
+  //       onReset: () => {
+  //         info.reset += 1
+  //       },
+  //     })
 
-      return {
-        store,
-        actions: {
-          ...actions,
-          start,
-          stop,
-          reset,
-        },
-      }
-    })
+  //     return {
+  //       store,
+  //       actions: {
+  //         ...actions,
+  //         start,
+  //         stop,
+  //         reset,
+  //       },
+  //     }
+  //   })
 
-    expect(info).toEqual({
-      data: 0,
-      start: 0,
-      stop: 0,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 0,
+  //     start: 0,
+  //     stop: 0,
+  //     reset: 0,
+  //   })
 
-    model.actions.start(10)
+  //   model.actions.start(10)
 
-    expect(info).toEqual({
-      data: 0,
-      start: 1,
-      stop: 0,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 0,
+  //     start: 1,
+  //     stop: 0,
+  //     reset: 0,
+  //   })
 
-    expect(list).toEqual([])
+  //   expect(list).toEqual([])
 
-    await delay(112)
+  //   await delay(112)
 
-    model.actions.start(1)
+  //   model.actions.start(1)
 
-    expect(info).toEqual({
-      data: 10,
-      start: 1,
-      stop: 0,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 10,
+  //     start: 1,
+  //     stop: 0,
+  //     reset: 0,
+  //   })
 
-    expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  //   expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    model.actions.stop()
+  //   model.actions.stop()
 
-    expect(info).toEqual({
-      data: 10,
-      start: 1,
-      stop: 1,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 10,
+  //     start: 1,
+  //     stop: 1,
+  //     reset: 0,
+  //   })
 
-    await delay(100)
+  //   await delay(100)
 
-    expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  //   expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    expect(info).toEqual({
-      data: 10,
-      start: 1,
-      stop: 1,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 10,
+  //     start: 1,
+  //     stop: 1,
+  //     reset: 0,
+  //   })
 
-    model.actions.start(10)
+  //   model.actions.start(10)
 
-    expect(info).toEqual({
-      data: 10,
-      start: 2,
-      stop: 1,
-      reset: 0,
-    })
+  //   expect(info).toEqual({
+  //     data: 10,
+  //     start: 2,
+  //     stop: 1,
+  //     reset: 0,
+  //   })
 
-    expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  //   expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    model.actions.reset()
+  //   model.actions.reset()
 
-    expect(info).toEqual({
-      data: 10,
-      start: 2,
-      stop: 1,
-      reset: 1,
-    })
+  //   expect(info).toEqual({
+  //     data: 10,
+  //     start: 2,
+  //     stop: 1,
+  //     reset: 1,
+  //   })
 
-    expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  //   expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    await delay(112)
+  //   await delay(112)
 
-    model.actions.stop()
+  //   model.actions.stop()
 
-    expect(info).toEqual({
-      data: 20,
-      start: 2,
-      stop: 2,
-      reset: 1,
-    })
+  //   expect(info).toEqual({
+  //     data: 20,
+  //     start: 2,
+  //     stop: 2,
+  //     reset: 1,
+  //   })
 
-    expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-  })
+  //   expect(list).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  // })
 })
