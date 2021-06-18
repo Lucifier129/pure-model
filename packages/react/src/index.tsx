@@ -260,7 +260,39 @@ export type ProviderProps = {
   list: ReactModelArgs[]
 }
 
-export const Provider: React.FC<ProviderProps> = ({ list = [], children }) => {
+export type SRA<S> = {
+  Model: ReactModel<Initializer<S>>
+  context?: ModelContextValue
+  preloadedState?: S
+}
+
+export const Provider = <
+  A extends any,
+  B extends any,
+  C extends any,
+  D extends any,
+  E extends any,
+  F extends any,
+  G extends any,
+  H extends any,
+  I extends any,
+  J extends any
+>({
+  list,
+  children,
+}: React.PropsWithChildren<{
+  list:
+    | [SRA<A>]
+    | [SRA<A>, SRA<B>]
+    | [SRA<A>, SRA<B>, SRA<C>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>, SRA<J>]
+}>) => {
   let [state, setState] = useReactState<{ Provider: React.FC } | null>(null)
 
   useIsomorphicLayoutEffect(() => {
@@ -385,7 +417,7 @@ export const provide = <MS extends ReactModels>(Models: MS) => <C extends Constr
     ReactModelArgs = createReactModelArgs(Models, this as any)
 
     render() {
-      return <Provider list={this.ReactModelArgs}>{super.render()}</Provider>
+      return <Provider list={this.ReactModelArgs as any}>{super.render()}</Provider>
     }
   }
 }
