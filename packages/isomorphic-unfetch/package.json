@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/isomorphic-unfetch",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Switches between unfetch & node-fetch for client & server.",
   "files": ["index.js", "index.d.ts", "browser.js"],
   "license": "MIT",
