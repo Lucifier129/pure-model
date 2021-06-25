@@ -19,6 +19,7 @@ module.exports = {
   rootDir: join(__dirname, '..'),
   testEnvironment: 'jsdom',
   moduleNameMapper: {
+    '@pure-model/isomorphic-unfetch': '<rootDir>/packages/isomorphic-unfetch',
     '@pure-model/([^/]+)(.*)$': '<rootDir>/packages/$1/src$2',
   },
   testPathIgnorePatterns: ['/node_modules/', '/examples/'],

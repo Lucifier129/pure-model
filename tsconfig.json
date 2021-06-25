@@ -24,6 +24,7 @@
     "paths": {
       "react": ["node_modules/@types/react"],
       "immer": ["node_modules/immer"],
+      "@pure-model/isomorphic-unfetch": ["./isomorphic-unfetch"],
       "@pure-model/*": ["./*/src/index.ts"]
     }
   },

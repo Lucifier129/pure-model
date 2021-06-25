@@ -46,6 +46,7 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
     if (!options.contexts) return mergeModelContext()
 
     if (Array.isArray(options.contexts)) {
+      // @ts-ignore
       return mergeModelContext(...options.contexts)
     }
 
@@ -85,7 +86,7 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
       let Component: any = InputComponent
 
       return (
-        <Provider key={key} list={ReactModelArgs}>
+        <Provider key={key} list={ReactModelArgs as any}>
           <Component {...rest} />
         </Provider>
       )

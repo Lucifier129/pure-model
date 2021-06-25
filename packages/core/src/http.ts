@@ -1,5 +1,5 @@
 import qs from 'qs'
-import fetch from 'isomorphic-unfetch'
+import fetch from '@pure-model/isomorphic-unfetch'
 import { setupEnv, setupPlatformInfo } from './env'
 
 function isAbsoluteUrl(url: string) {
