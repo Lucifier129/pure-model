@@ -11,5 +11,8 @@
     "node-fetch": "^2.6.1",
     "unfetch": "^4.2.0"
   },
-  "gitHead": "3ea8535b0275ea62be779d101c10ddbd134b53ae"
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "46f33fbc6a53f32851d35963ddd764c6140a6c99"
 }
