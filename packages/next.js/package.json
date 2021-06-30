@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/next.js",
-  "version": "1.2.12",
+  "version": "1.2.13",
   "description": "Next.js adapter for pure-model",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -16,8 +16,8 @@
     "react-dom": "^16.14.0 || ^17.0.0"
   },
   "devDependencies": {
-    "@pure-model/core": "^1.2.12",
-    "@pure-model/react": "^1.2.12",
+    "@pure-model/core": "^1.2.13",
+    "@pure-model/react": "^1.2.13",
     "next": ">=10.0.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
