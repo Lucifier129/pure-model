@@ -1,6 +1,6 @@
 {
   "name": "pure-model-nextjs-typescript",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "private": true,
   "scripts": {
     "dev": "next",
@@ -9,9 +9,9 @@
     "type-check": "tsc"
   },
   "dependencies": {
-    "@pure-model/core": "^1.2.9",
-    "@pure-model/next.js": "^1.2.9",
-    "@pure-model/react": "^1.2.9",
+    "@pure-model/core": "^1.2.10",
+    "@pure-model/next.js": "^1.2.10",
+    "@pure-model/react": "^1.2.10",
     "classnames": "^2.2.6",
     "markdown-it": "^12.0.1",
     "next": "^10.0.0",
