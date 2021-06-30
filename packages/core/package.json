@@ -10,12 +10,11 @@
   "author": "Jade Gu",
   "license": "MIT",
   "devDependencies": {
-    "@types/qs": "^6.9.2",
     "@types/redux-logger": "^3.0.7"
   },
   "dependencies": {
     "@pure-model/isomorphic-unfetch": "^1.2.9",
-    "qs": "^6.9.4",
+    "query-string": "^7.0.1",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "tslib": "^2.0.3"

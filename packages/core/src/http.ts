@@ -1,4 +1,4 @@
-import qs from 'qs'
+import querystring from 'query-string'
 import fetch from '@pure-model/isomorphic-unfetch'
 import { setupEnv, setupPlatformInfo } from './env'
 
@@ -68,7 +68,7 @@ export const setupGetJSON = () => {
   let getJSON = async (url: string, params?: object, options?: RequestInit) => {
     if (params) {
       let prefix = url.includes('?') ? '&' : '?'
-      url += prefix + qs.stringify(params)
+      url += prefix + querystring.stringify(params)
     }
 
     let response = await fetch(url, {

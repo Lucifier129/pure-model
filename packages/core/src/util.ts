@@ -37,7 +37,7 @@ export const shallowEqual = (objA: any, objB: any) => {
   return true
 }
 
-export const isThenble = (input: any): boolean => !!(input && typeof input.then === 'function')
+export const isThenable = (input: any): boolean => !!(input && typeof input.then === 'function')
 
 export const forcePlainDataCheck = (input: any, path = ''): void => {
   if (input === null) return

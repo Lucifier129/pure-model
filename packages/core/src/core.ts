@@ -2,9 +2,9 @@ import { createStore as createReduxStore, compose, Store, PreloadedState, applyM
 
 import { createLogger } from 'redux-logger'
 
-import { isPlainObject, shallowEqual, forcePlainDataCheck, identity, isThenble } from './util'
+import { isPlainObject, shallowEqual, forcePlainDataCheck, identity, isThenable } from './util'
 
-export { identity, shallowEqual, isThenble }
+export { identity, shallowEqual, isThenable }
 
 export type { Store, PreloadedState }
 
@@ -71,6 +71,7 @@ const createHooks = <HS extends Hooks>(defaultHooks: DefaultHooks<HS>) => {
       if (typeof handler !== 'function') {
         handler = defaultHooks[key]
       }
+      // @ts-ignore
       return handler(...args)
     }) as HS[typeof key]
 
