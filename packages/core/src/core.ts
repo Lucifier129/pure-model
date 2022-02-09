@@ -24,7 +24,9 @@ type Actions = {
 
 export type Tail<T extends any[]> = ((...t: T) => any) extends (_: any, ...tail: infer TT) => any ? TT : []
 
-export type ReducerToAction<R extends Reducer> = R extends (...args: infer Args) => any
+export type ReducerToAction<R extends Reducer> = R extends { (...args: infer Args1): any, (...args: infer Args2): any }
+  ? (...args: Tail<Args1> | Tail<Args2>) => void
+  : R extends (...args: infer Args) => any
   ? (...args: Tail<Args>) => void
   : never
 
