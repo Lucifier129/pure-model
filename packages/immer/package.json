@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/immer",
-  "version": "1.2.4",
+  "version": "1.2.15",
   "description": "Immer adapter for pure-model",
   "main": "dist/index.js",
   "esnext": "next/index.js",

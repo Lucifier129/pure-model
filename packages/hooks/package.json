@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/hooks",
-  "version": "1.2.13",
+  "version": "1.2.15",
   "description": "Some useful hooks for pure-model",
   "main": "dist/index.js",
   "esnext": "next/index.js",
@@ -11,7 +11,7 @@
     "@pure-model/core": "^1.0.0"
   },
   "devDependencies": {
-    "@pure-model/core": "^1.2.13"
+    "@pure-model/core": "^1.2.15"
   },
   "dependencies": {
     "tslib": "^2.0.3"

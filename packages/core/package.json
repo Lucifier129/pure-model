@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/core",
-  "version": "1.2.13",
+  "version": "1.2.15",
   "description": "A framework for writing model-oriented programming",
   "main": "dist/index.js",
   "esnext": "next/index.js",
@@ -12,7 +12,7 @@
     "@types/redux-logger": "^3.0.7"
   },
   "dependencies": {
-    "@pure-model/isomorphic-unfetch": "^1.2.9",
+    "@pure-model/isomorphic-unfetch": "^1.2.15",
     "query-string": "^7.0.0",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
