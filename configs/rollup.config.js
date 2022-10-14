@@ -30,7 +30,7 @@ pkgs.forEach((dir) => {
 const external = [...set]
 
 export default pkgs.map((dir) => ({
-  input: `${dir}/esm/index.js`,
+  input: `${dir}/next/index.js`,
   external,
   plugins: [sourcemaps()],
   output: [

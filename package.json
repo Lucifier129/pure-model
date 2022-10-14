@@ -6,8 +6,7 @@
   "author": "https://github.com/Lucifier129",
   "private": true,
   "scripts": {
-    "build": "run-s clean build:esm build:next build:cjs clean:tests",
-    "build:esm": "tsc -b ./configs/tsconfig.project.json",
+    "build": "run-s clean build:next build:cjs clean:tests",
     "build:next": "tsc -b ./configs/tsconfig.next.json",
     "build:cjs": "rollup --config ./configs/rollup.config.js",
     "clean": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/{esm,dist,next}",

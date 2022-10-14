@@ -3,9 +3,8 @@
   "version": "1.2.13",
   "description": "Some useful hooks for pure-model",
   "main": "dist/index.js",
-  "module": "esm/index.js",
   "esnext": "next/index.js",
-  "types": "esm/index.d.ts",
+  "types": "next/index.d.ts",
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
