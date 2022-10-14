@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@pure-model/isomorphic-unfetch": "^1.2.9",
-    "query-string": "7.0.0",
+    "query-string": "^7.0.0",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "tslib": "^2.0.3"
