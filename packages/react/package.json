@@ -1,6 +1,6 @@
 {
   "name": "@pure-model/react",
-  "version": "1.2.15",
+  "version": "1.2.16",
   "description": "React adapter for pure-model",
   "main": "dist/index.js",
   "esnext": "next/index.js",
