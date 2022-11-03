@@ -103,7 +103,7 @@ export default createReactModel(() => {
     let { searchParams } = store.getState()
 
     let topics = await getTopics(searchParams)
-
+    console.log('topic', topics)
     actions.setTopics(topics)
   }
 
@@ -137,9 +137,7 @@ export default createReactModel(() => {
     })
   }
 
-  console.log('ctrl', ctrl)
-
-  setupStartCallback(async () => {
+  setupPreloadCallback(async () => {
     initSearchParams()
     await getCurrentTopics()
   })

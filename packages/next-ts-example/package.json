@@ -14,7 +14,7 @@
     "@pure-model/react": "^1.2.15",
     "classnames": "^2.2.6",
     "markdown-it": "^12.0.1",
-    "next": "^10.0.0",
+    "next": "10.0.4",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },

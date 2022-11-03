@@ -10,7 +10,7 @@ import {
   setupContext,
 } from '@pure-model/core'
 
-import { Provider, ReactModels, ReactModelInitilizer } from '@pure-model/react'
+import { HydrateProvider, ReactModels, ReactModelInitilizer } from '@pure-model/react'
 
 import type { NextPage, NextPageContext } from 'next'
 
@@ -86,9 +86,9 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
       let Component: any = InputComponent
 
       return (
-        <Provider key={key} list={ReactModelArgs as any}>
+        <HydrateProvider key={key} list={ReactModelArgs as any}>
           <Component {...rest} />
-        </Provider>
+        </HydrateProvider>
       )
     }
 

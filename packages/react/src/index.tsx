@@ -103,7 +103,7 @@ export const createReactModel = <I extends Initializer>(initilizer: I): ReactMod
       } else {
         selectedState = latestSelectedState.current
       }
-    } catch (err) {
+    } catch (err: any) {
       if (latestSubscriptionCallbackError.current) {
         err.message += `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`
       }
@@ -138,7 +138,7 @@ export const createReactModel = <I extends Initializer>(initilizer: I): ReactMod
 
           latestSelectedState.current = newSelectedState
           latestStoreState.current = storeState
-        } catch (err) {
+        } catch (err: any) {
           // we ignore all errors here, since when the component
           // is re-rendered, the selectors are called again, and
           // will throw again, if neither props nor store state
@@ -315,6 +315,44 @@ export const Provider = <
   if (!Provider) return null
 
   return <Provider>{children}</Provider>
+}
+
+export const HydrateProvider = <
+  A extends any,
+  B extends any,
+  C extends any,
+  D extends any,
+  E extends any,
+  F extends any,
+  G extends any,
+  H extends any,
+  I extends any,
+  J extends any
+>({
+  list,
+  children,
+}: React.PropsWithChildren<{
+  list:
+    | [SRA<A>]
+    | [SRA<A>, SRA<B>]
+    | [SRA<A>, SRA<B>, SRA<C>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>]
+    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>, SRA<J>]
+}>) => {
+  for (const item of list) {
+    children = (
+      <item.Model.Provider context={item.context} preloadedState={item.preloadedState as any}>
+        {children}
+      </item.Model.Provider>
+    )
+  }
+
+  return <>{children}</>
 }
 
 type CombinedReactModelState<T extends ReactModelArgs[]> = ReactModelState<T[number]['Model']>[]

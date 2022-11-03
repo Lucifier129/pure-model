@@ -8,7 +8,6 @@ import { implCtrlContext } from '../../model-contexts/CtrlContextImpl'
 
 const Page = page({
   contexts: (options) => {
-    console.log('options', options)
     return [implCtrlContext(options)]
   },
   Models: {
