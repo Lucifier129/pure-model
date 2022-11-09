@@ -257,7 +257,8 @@ export type ReactModelArgs = {
 }
 
 export type ProviderProps = {
-  list: ReactModelArgs[]
+  list: ReactModelArgs[],
+  children: React.ReactNode,
 }
 
 export type SRA<S> = {
