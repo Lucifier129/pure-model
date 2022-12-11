@@ -389,7 +389,7 @@ const createCallbackManager = () => {
   }
 
   let preload = async <T>(): Promise<T[]> => {
-    if (isPreloaded) {
+    if (isPreloaded || !preloadCallbackList.length) {
       return []
     }
 
