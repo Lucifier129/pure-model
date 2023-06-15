@@ -43,6 +43,7 @@ export type ReactModel<I extends Initializer = any> = {
     model?: Model<InitializerState<I>>
     context?: ModelContextValue
     preloadedState?: InitializerState<I>
+    fallback?: React.ReactNode
   }>
   preload: (
     context?: ModelContextValue,
@@ -55,15 +56,15 @@ export type ReactModel<I extends Initializer = any> = {
   create: I
 }
 
-export type ReactModelInitilizer<RM extends ReactModel> = RM extends ReactModel<infer I> ? I : never
+export type ReactModelInitializer<RM extends ReactModel> = RM extends ReactModel<infer I> ? I : never
 
-export type ReactModelState<RM extends ReactModel> = InitializerState<ReactModelInitilizer<RM>>
+export type ReactModelState<RM extends ReactModel> = InitializerState<ReactModelInitializer<RM>>
 
 const DefaultValue = Symbol('default-value')
 
 type DefaultValue = typeof DefaultValue
 
-export const createReactModel = <I extends Initializer>(initilizer: I): ReactModel<I> => {
+export const createReactModel = <I extends Initializer>(initializer: I): ReactModel<I> => {
   type State = InitializerState<I>
   type Value = {
     store: Store<State>
@@ -177,7 +178,7 @@ export const createReactModel = <I extends Initializer>(initilizer: I): ReactMod
     let model = useMemo(() => {
       if (props.model) return props.model
       let options = { context, preloadedState }
-      return createPureModel(initilizer, options)
+      return createPureModel(initializer, options)
     }, [])
 
     let value = useMemo(() => {
@@ -213,13 +214,13 @@ export const createReactModel = <I extends Initializer>(initilizer: I): ReactMod
       }
     }, [])
 
-    if (!isReady) return null
+    if (!isReady) return <>{props.fallback ?? null}</>
 
     return <ReactContext.Provider value={value as Value}>{children}</ReactContext.Provider>
   }
 
   let preload: ReactModel<I>['preload'] = async (context, preloadedState) => {
-    let model = createPureModel(initilizer, { context, preloadedState })
+    let model = createPureModel(initializer, { context, preloadedState })
 
     await model.preload()
 
@@ -242,7 +243,7 @@ export const createReactModel = <I extends Initializer>(initilizer: I): ReactMod
     useActions,
     Provider,
     preload,
-    create: initilizer,
+    create: initializer,
   }
 }
 
@@ -257,43 +258,12 @@ export type ReactModelArgs = {
 }
 
 export type ProviderProps = {
-  list: ReactModelArgs[],
-  children: React.ReactNode,
+  list: ReactModelArgs[]
+  children: React.ReactNode
+  fallback?: React.ReactNode
 }
 
-export type SRA<S> = {
-  Model: ReactModel<Initializer<S>>
-  context?: ModelContextValue
-  preloadedState?: S
-}
-
-export const Provider = <
-  A extends any,
-  B extends any,
-  C extends any,
-  D extends any,
-  E extends any,
-  F extends any,
-  G extends any,
-  H extends any,
-  I extends any,
-  J extends any
->({
-  list,
-  children,
-}: React.PropsWithChildren<{
-  list:
-    | [SRA<A>]
-    | [SRA<A>, SRA<B>]
-    | [SRA<A>, SRA<B>, SRA<C>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>, SRA<J>]
-}>) => {
+export const Provider = ({ list, children, fallback }: ProviderProps) => {
   let [state, setState] = useReactState<{ Provider: React.FC } | null>(null)
 
   useIsomorphicLayoutEffect(() => {
@@ -313,41 +283,17 @@ export const Provider = <
 
   let Provider = state?.Provider
 
-  if (!Provider) return null
+  if (!Provider) return <>{fallback ?? null}</>
 
   return <Provider>{children}</Provider>
 }
 
-export const HydrateProvider = <
-  A extends any,
-  B extends any,
-  C extends any,
-  D extends any,
-  E extends any,
-  F extends any,
-  G extends any,
-  H extends any,
-  I extends any,
-  J extends any
->({
-  list,
-  children,
-}: React.PropsWithChildren<{
-  list:
-    | [SRA<A>]
-    | [SRA<A>, SRA<B>]
-    | [SRA<A>, SRA<B>, SRA<C>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>]
-    | [SRA<A>, SRA<B>, SRA<C>, SRA<D>, SRA<E>, SRA<F>, SRA<G>, SRA<H>, SRA<I>, SRA<J>]
-}>) => {
+export type HydrateProviderProps = ProviderProps
+
+export const HydrateProvider = ({ list, children, fallback }: HydrateProviderProps) => {
   for (const item of list) {
     children = (
-      <item.Model.Provider context={item.context} preloadedState={item.preloadedState as any}>
+      <item.Model.Provider context={item.context} preloadedState={item.preloadedState as any} fallback={fallback}>
         {children}
       </item.Model.Provider>
     )
@@ -394,16 +340,16 @@ export const preload = async <T extends ReactModelArgs[]>(list: T) => {
 
 export const useReactModel = <RM extends ReactModel>(
   ReactModel: RM,
-  options?: CreatePureModelOptions<ReactModelInitilizer<RM>> & {
+  options?: CreatePureModelOptions<ReactModelInitializer<RM>> & {
     onError?: (error: Error) => any
   },
-): [InitializerState<ReactModelInitilizer<RM>>, InitializerActions<ReactModelInitilizer<RM>>] => {
+): [InitializerState<ReactModelInitializer<RM>>, InitializerActions<ReactModelInitializer<RM>>] => {
   let model = useMemo(() => {
     let model = createPureModel(ReactModel.create, options)
     return model as Model
   }, [])
 
-  let [state, setState] = useReactState(() => model.store.getState() as InitializerState<ReactModelInitilizer<RM>>)
+  let [state, setState] = useReactState(() => model.store.getState() as InitializerState<ReactModelInitializer<RM>>)
 
   useIsomorphicLayoutEffect(() => {
     let isUnmounted = false
@@ -433,7 +379,7 @@ export const useReactModel = <RM extends ReactModel>(
     }
   }, [])
 
-  return [state, model.actions as InitializerActions<ReactModelInitilizer<RM>>]
+  return [state, model.actions as InitializerActions<ReactModelInitializer<RM>>]
 }
 
 type Constructor = new (...args: any[]) => any

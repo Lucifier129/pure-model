@@ -174,19 +174,19 @@ export type PresetHooks = {
 
 let { run, hooks } = createHooks<PresetHooks>({
   setupStore() {
-    throw new Error(`setupStore can't not be called after initilizing`)
+    throw new Error(`setupStore can't not be called after initializing`)
   },
   setupContext() {
-    throw new Error(`setupContext can't not be called after initilizing`)
+    throw new Error(`setupContext can't not be called after initializing`)
   },
   setupStartCallback() {
-    throw new Error(`setupStartCallback can't not be called after initilizing`)
+    throw new Error(`setupStartCallback can't not be called after initializing`)
   },
   setupFinishCallback() {
-    throw new Error(`setupFinishCallback can't not be called after initilizing`)
+    throw new Error(`setupFinishCallback can't not be called after initializing`)
   },
   setupPreloadCallback() {
-    throw new Error(`setupPreloadCallback can't not be called after initilizing`)
+    throw new Error(`setupPreloadCallback can't not be called after initializing`)
   },
 })
 
@@ -315,7 +315,10 @@ const publish = (callbackList: CallbackList) => {
   return resultList
 }
 
+let uid = 0
+
 const createCallbackManager = () => {
+  let id = uid++
   let isPreloaded = false
   let isStarted = false
   let isFinished = false
@@ -390,6 +393,7 @@ const createCallbackManager = () => {
 
   let preload = async <T>(): Promise<T[]> => {
     if (isPreloaded || !preloadCallbackList.length) {
+      isPreloaded = true
       return []
     }
 
@@ -400,7 +404,7 @@ const createCallbackManager = () => {
 
     isPreloaded = true
 
-    return (resultList as unknown) as Promise<T[]>
+    return (resultList as unknown) as T[]
   }
 
   let clearPreloadCallbackList = () => {
@@ -487,23 +491,23 @@ export const createPureModel = <I extends Initializer>(initializer: I, options: 
     let result = initializer()
 
     if (!result) {
-      throw new Error(`Expected initialzer returning { store, actions }, but got ${result}`)
+      throw new Error(`Expected initializer returning { store, actions }, but got ${result}`)
     }
 
     let { store, actions } = result
 
     if (!store) {
-      throw new Error(`Expected initialzer returning { store, actions }, but got a invalid store: ${store}`)
+      throw new Error(`Expected initializer returning { store, actions }, but got a invalid store: ${store}`)
     }
 
     if (!actions) {
-      throw new Error(`Expected initialzer returning { store, actions }, but got a invalid actions: ${actions}`)
+      throw new Error(`Expected initializer returning { store, actions }, but got a invalid actions: ${actions}`)
     }
 
     return { store, actions } as ReturnType<I>
   }, implementations)
 
-  // ignore preload callbacs if preloadedState was received
+  // ignore preload callbacks if preloadedState was received
   if (options.preloadedState !== undefined) {
     clearPreloadCallbackList()
   }
@@ -548,7 +552,7 @@ export function select<S, TSelected = unknown>(options: {
 }) {
   if (!isPlainObject(options)) {
     throw new Error(
-      `Expected subscribe(options) recieved { store, listener, selector?, compare? }, instead of ${options}`,
+      `Expected subscribe(options) received { store, listener, selector?, compare? }, instead of ${options}`,
     )
   }
 

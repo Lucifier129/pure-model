@@ -10,12 +10,12 @@ import {
   setupContext,
 } from '@pure-model/core'
 
-import { HydrateProvider, ReactModels, ReactModelInitilizer } from '@pure-model/react'
+import { HydrateProvider, ReactModels, ReactModelInitializer } from '@pure-model/react'
 
 import type { NextPage, NextPageContext } from 'next'
 
 export type PageModels<T extends ReactModels> = {
-  [key in keyof T]: ReturnType<ReactModelInitilizer<T[key]>>
+  [key in keyof T]: ReturnType<ReactModelInitializer<T[key]>>
 }
 
 const isServer = typeof window === 'undefined'

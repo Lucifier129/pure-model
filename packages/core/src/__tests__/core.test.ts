@@ -68,7 +68,7 @@ describe('pure-model', () => {
   it('should reconcile life-cycle hooks in the correct order', async () => {
     let starts: number[] = []
     let preloads: number[] = []
-    let finishs: number[] = []
+    let finishes: number[] = []
     let counter = createPureModel(() => {
       let counter = setupCounter()
       let i = 0
@@ -90,11 +90,11 @@ describe('pure-model', () => {
       })
 
       setupFinishCallback(() => {
-        finishs.push(i++)
+        finishes.push(i++)
       })
 
       setupFinishCallback(() => {
-        finishs.push(i++)
+        finishes.push(i++)
       })
 
       return counter
@@ -119,7 +119,7 @@ describe('pure-model', () => {
 
     expect(preloads).toEqual([0, 1])
     expect(starts).toEqual([2, 3])
-    expect(finishs).toEqual([4, 5])
+    expect(finishes).toEqual([4, 5])
   })
 
   it('should not consume state before .start()', async () => {
