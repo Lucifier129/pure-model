@@ -60,7 +60,7 @@ type DefaultHooks<HS extends Hooks> = {
 }
 
 const createHooks = <HS extends Hooks>(defaultHooks: DefaultHooks<HS>) => {
-  let currentHooks: Hooks = {}
+  let currentHooks: Hooks = defaultHooks
 
   let hooks = {} as HS
 
@@ -79,11 +79,12 @@ const createHooks = <HS extends Hooks>(defaultHooks: DefaultHooks<HS>) => {
   }
 
   let run = <F extends AnyFn>(f: F, implementations: HS): ReturnType<F> => {
+    let previousHooks = currentHooks
     try {
-      currentHooks = implementations || defaultHooks
+      currentHooks = implementations ?? currentHooks
       return f()
     } finally {
-      currentHooks = defaultHooks
+      currentHooks = previousHooks
     }
   }
 

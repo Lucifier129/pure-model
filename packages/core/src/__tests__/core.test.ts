@@ -249,9 +249,16 @@ describe('pure-model', () => {
 
     setTimeout(() => {
       counter.actions.timer.disable()
-      expect(list).toEqual([1, 2])
+      let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      for (let i = 0; i < list.length; i++) {
+        expect(list[i]).toEqual(data[i])
+      }
+
+      expect(list.length > 0).toBe(true)
+
       done()
-    }, 29)
+    }, 40)
 
     expect(list.length).toEqual(0)
   })

@@ -31,6 +31,7 @@ export default createReactModel(() => {
   let { store, actions } = setupStore({
     name: 'LayoutModel',
     initialState,
+    logger: typeof window !== 'undefined',
     reducers: {
       openMenu: (state: LayoutState) => {
         return {

@@ -8,6 +8,7 @@ import {
   Initializer,
   createModelContext,
   setupContext,
+  createPureModelContainer,
 } from '@pure-model/core'
 
 import { HydrateProvider, ReactModels, ReactModelInitializer } from '@pure-model/react'
@@ -110,9 +111,12 @@ export const page = <T extends ReactModels>(options: PageOptions<T>) => {
         }),
       )
 
+      let container = createPureModelContainer()
+
       let modelList = Object.values(options.Models).map((Model) => {
         return createPureModel(Model.create as Initializer, {
           context,
+          container,
         })
       })
 

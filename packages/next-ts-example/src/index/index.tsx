@@ -1,7 +1,7 @@
 import { page } from '@pure-model/next.js'
 
 import LayoutModel from '../../models/LayoutModel'
-import IndexModel from './Model'
+import IndexModel, { CommonModel } from './Model'
 import View from './View'
 
 import { implCtrlContext } from '../../model-contexts/CtrlContextImpl'
@@ -13,6 +13,7 @@ const Page = page({
   Models: {
     LayoutModel,
     IndexModel,
+    CommonModel,
   },
 })
 

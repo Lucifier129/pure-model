@@ -1,12 +1,13 @@
 /**
  * Model
  */
-import { setupStore, setupPreloadCallback, setupStartCallback } from '@pure-model/core'
+import { setupStore, setupPreloadCallback, setupStartCallback, setupModel } from '@pure-model/core'
 import { createReactModel } from '@pure-model/react'
 import { setupPageContext } from '@pure-model/next.js'
 
 import { setupGetJSON } from '../../model-hooks/http'
 import { setupCtrl } from '../../model-contexts/CtrlContext'
+import LayoutModel from '../../models/LayoutModel'
 
 export type Topic = {
   id: string
@@ -52,11 +53,33 @@ export const initialState: State = {
   },
 }
 
+export const CommonModel = createReactModel(() => {
+  let { store, actions } = setupStore({
+    name: 'CommonModel',
+    initialState: 0,
+    logger: typeof window !== 'undefined',
+    reducers: {
+      incre: (state: number) => {
+        return state + 1
+      },
+    },
+  })
+
+  setupPreloadCallback(() => {
+    actions.incre()
+  })
+
+  return {
+    store,
+    actions,
+  }
+})
+
 export default createReactModel(() => {
   let { store, actions } = setupStore({
     name: 'IndexModel',
     initialState: initialState,
-    logger: true,
+    logger: typeof window !== 'undefined',
     reducers: {
       /**
        * 更新查询参数
@@ -94,6 +117,22 @@ export default createReactModel(() => {
   let ctrl = setupCtrl()
   let getJSON = setupGetJSON()
 
+  let commonModel = setupModel(CommonModel)
+
+  setupPreloadCallback(() => {
+    commonModel.actions.incre()
+  })
+
+  setupStartCallback(() => {
+    console.log('commonModel state', commonModel.store.getState())
+  })
+
+  let layoutModel = setupModel(LayoutModel)
+
+  setupStartCallback(() => {
+    layoutModel.actions.openMenu()
+  })
+
   let getTopics = async (searchParams: SearchParams) => {
     let json = (await getJSON('/topics', searchParams)) as { data: Topic[] }
     return json.data
@@ -103,7 +142,6 @@ export default createReactModel(() => {
     let { searchParams } = store.getState()
 
     let topics = await getTopics(searchParams)
-    console.log('topic', topics)
     actions.setTopics(topics)
   }
 
