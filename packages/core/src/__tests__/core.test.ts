@@ -8,9 +8,9 @@ import {
   setupFinishCallback,
   setupPreloadCallback,
   subscribe,
-  select,
-  combineStore,
   mergeModelContext,
+  setupModel,
+  createPureModelContainer,
 } from '../core'
 
 const setupInterval = (f: () => void) => {
@@ -182,78 +182,6 @@ describe('pure-model', () => {
     }).toThrow()
   })
 
-  // it('supports combining stores and returning nested actions', async () => {
-  //   let multiCounters = createPureModel(() => {
-  //     let a = setupCounter(10)
-  //     let b = setupCounter(20)
-
-  //     let store = combineStore({
-  //       a: a.store,
-  //       b: b.store
-  //     })
-
-  //     let actions = {
-  //       a: a.actions,
-  //       b: b.actions
-  //     }
-
-  //     return {
-  //       store,
-  //       actions
-  //     }
-  //   })
-
-  //   expect(multiCounters.store.getState()).toEqual({
-  //     a: 10,
-  //     b: 20
-  //   })
-
-  //   let list: { a: number; b: number }[] = []
-
-  //   subscribe(multiCounters, state => {
-  //     list.push(state)
-  //   })
-
-  //   await multiCounters.preload()
-  //   multiCounters.start()
-
-  //   multiCounters.actions.a.incre()
-  //   multiCounters.actions.b.decre()
-
-  //   multiCounters.actions.a.decre()
-  //   multiCounters.actions.b.incre()
-
-  //   multiCounters.actions.a.increBy(1)
-  //   multiCounters.actions.b.increBy(-1)
-
-  //   expect(list).toEqual([
-  //     {
-  //       a: 11,
-  //       b: 20
-  //     },
-  //     {
-  //       a: 11,
-  //       b: 19
-  //     },
-  //     {
-  //       a: 10,
-  //       b: 19
-  //     },
-  //     {
-  //       a: 10,
-  //       b: 20
-  //     },
-  //     {
-  //       a: 11,
-  //       b: 20
-  //     },
-  //     {
-  //       a: 11,
-  //       b: 19
-  //     }
-  //   ])
-  // })
-
   it('supports calling actions in life-cycle hooks', async () => {
     let counter = createPureModel(() => {
       let { store, actions } = setupCounter(10)
@@ -400,5 +328,161 @@ describe('pure-model', () => {
     )
 
     expect(counter.store.getState()).toEqual(1)
+  })
+
+  it('support setupModel to access another models', async () => {
+    let TestContext = createModelContext(0)
+
+    function counter0() {
+      let { store, actions } = setupCounter()
+
+      let testContext = setupContext(TestContext)
+
+      setupPreloadCallback(() => {
+        actions.increBy(10 + testContext)
+      })
+
+      return {
+        store,
+        actions,
+      }
+    }
+
+    function counter1() {
+      let { store, actions } = setupCounter()
+
+      let testContext = setupContext(TestContext)
+
+      setupPreloadCallback(() => {
+        actions.increBy(20 + testContext)
+      })
+
+      return {
+        store,
+        actions,
+      }
+    }
+
+    type Counter2State = {
+      count1: number
+      count2: number
+      testContextValue: number
+    }
+
+    function counter2() {
+      let { store, actions } = setupStore({
+        initialState: {
+          count1: 0,
+          count2: 0,
+        } as Counter2State,
+        reducers: {
+          update: (state: Counter2State, newState: Counter2State): Counter2State => {
+            return {
+              ...state,
+              ...newState,
+            }
+          },
+        },
+      })
+
+      let testContext = setupContext(TestContext)
+
+      let counter0Model = setupModel(counter0)
+
+      let counter1Model = setupModel(counter1)
+
+      setupPreloadCallback(() => {
+        actions.update({
+          count1: counter0Model.store.getState(),
+          count2: counter1Model.store.getState(),
+          testContextValue: testContext,
+        })
+      })
+
+      return {
+        store,
+        actions,
+      }
+    }
+
+    let container = createPureModelContainer()
+    let testContext = TestContext.create(3)
+
+    container.set(counter0, {
+      context: testContext,
+    })
+
+    container.set(counter1, {
+      context: testContext,
+    })
+
+    let counter0Model = createPureModel(counter0, {
+      container: container,
+    })
+
+    let counter1Model = createPureModel(counter1, {
+      container: container,
+    })
+
+    let counter2Model = createPureModel(counter2, {
+      container: container,
+      context: TestContext.create(4),
+    })
+
+    await counter2Model.preload()
+
+    expect(counter0Model.isPreloaded()).toEqual(true)
+    expect(counter0Model.store.getState()).toEqual(13)
+
+    expect(counter1Model.isPreloaded()).toEqual(true)
+    expect(counter1Model.store.getState()).toEqual(23)
+
+    expect(counter2Model.store.getState()).toEqual({
+      count1: 13,
+      count2: 23,
+      testContextValue: 4,
+    })
+
+    // test preloadedState
+
+    container = createPureModelContainer()
+    testContext = TestContext.create(3)
+
+    container.set(counter0, {
+      preloadedState: 100,
+      context: testContext,
+    })
+
+    container.set(counter1, {
+      preloadedState: 200,
+      context: testContext,
+    })
+
+    counter0Model = createPureModel(counter0, {
+      container: container,
+    })
+
+    counter1Model = createPureModel(counter1, {
+      container: container,
+    })
+
+    counter2Model = createPureModel(counter2, {
+      container: container,
+      context: TestContext.create(4),
+    })
+
+    await counter2Model.preload()
+
+    expect(counter0Model.isPreloaded()).toEqual(true)
+    expect(counter0Model.store.getState()).toEqual(100)
+
+    expect(counter1Model.isPreloaded()).toEqual(true)
+    expect(counter1Model.store.getState()).toEqual(200)
+
+    expect(counter2Model.store.getState()).toEqual({
+      count1: 100,
+      count2: 200,
+      testContextValue: 4,
+    })
   })
 })

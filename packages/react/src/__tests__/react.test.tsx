@@ -10,8 +10,10 @@ import {
   setupFinishCallback,
   setupPreloadCallback,
   MODEL_CONTEXT,
+  setupModel,
+  createPureModelContainer,
 } from '@pure-model/core'
-import { createReactModel, Provider, preload, useReactModel, provide } from '../'
+import { createReactModel, Provider, preload, useReactModel, provide, ReactModelArgs } from '../'
 
 const createDeferred = () => {
   let resolve
@@ -269,8 +271,8 @@ describe('react bindings of pure-model', () => {
   })
 
   it('can pass multiple ReactModel to Provider component', async () => {
-    let Model0 = createReactModel(setupCounter)
-    let Model1 = createReactModel(setupCounter)
+    let Model0 = createReactModel(() => setupCounter())
+    let Model1 = createReactModel(() => setupCounter())
 
     let App = () => {
       let state0 = Model0.useState()
@@ -462,8 +464,8 @@ describe('react bindings of pure-model', () => {
   })
 
   it('can preload multiple ReactModel', async () => {
-    let Model0 = createReactModel(setupCounter)
-    let Model1 = createReactModel(setupCounter)
+    let Model0 = createReactModel(() => setupCounter())
+    let Model1 = createReactModel(() => setupCounter())
 
     let App = () => {
       let state0 = Model0.useState()
@@ -840,5 +842,119 @@ describe('react bindings of pure-model', () => {
     })
 
     expect($count.textContent).toBe('3')
+  })
+
+  it('support setupModel to access another ReactModel', async () => {
+    let Model0 = createReactModel(() => {
+      let { store, actions } = setupCounter(3)
+
+      setupPreloadCallback(() => {
+        actions.increBy(10)
+      })
+
+      return { store, actions }
+    })
+
+    let Model1 = createReactModel(() => {
+      let { store, actions } = setupCounter(4)
+
+      let model1 = setupModel(Model0)
+
+      setupPreloadCallback(() => {
+        actions.increBy(model1.store.getState())
+      })
+
+      return { store, actions }
+    })
+
+    let App = () => {
+      let model0state = Model0.useState()
+      let model0actions = Model0.useActions()
+
+      let model1state = Model1.useState()
+      let model1actions = Model1.useActions()
+
+      let handleIncre = () => {
+        model0actions.incre()
+        model1actions.incre()
+      }
+
+      let handleDescre = () => {
+        model0actions.decre()
+        model1actions.decre()
+      }
+
+      useEffect(() => {
+        next()
+      })
+
+      return (
+        <>
+          <button id="incre" onClick={handleIncre}>
+            +1
+          </button>
+          <span id="count1">{model0state}</span>
+          <span id="count2">{model1state}</span>
+          <button id="decre" onClick={handleDescre}>
+            -1
+          </button>
+        </>
+      )
+    }
+
+    let modelContainer = createPureModelContainer()
+
+    let list: ReactModelArgs[] = [
+      {
+        Model: Model0,
+      },
+      {
+        Model: Model1,
+      },
+    ]
+
+    act(() => {
+      ReactDOM.render(
+        <Provider list={list} container={modelContainer}>
+          <App />
+        </Provider>,
+        container,
+      )
+    })
+
+    await deferred.promise
+    deferred = createDeferred()
+
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    let $incre = document.querySelector('#incre') as Element
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    let $decre = document.querySelector('#decre') as Element
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    let $count1 = document.querySelector('#count1') as Element
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    let $count2 = document.querySelector('#count2') as Element
+
+    expect($count1.textContent).toBe('13')
+    expect($count2.textContent).toBe('17')
+
+    // tslint:disable-next-line: await-promise
+    await act(async () => {
+      $incre.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await deferred.promise
+      deferred = createDeferred()
+    })
+
+    expect($count1.textContent).toBe('14')
+    expect($count2.textContent).toBe('18')
+
+    // tslint:disable-next-line: await-promise
+    await act(async () => {
+      $decre.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await deferred.promise
+      deferred = createDeferred()
+    })
+
+    expect($count1.textContent).toBe('13')
+    expect($count2.textContent).toBe('17')
   })
 })

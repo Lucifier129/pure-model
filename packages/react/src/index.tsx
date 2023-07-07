@@ -17,9 +17,10 @@ import {
   createPureModel,
   CreatePureModelOptions,
   ModelContextValue,
-  subscribe,
   identity,
   shallowEqual,
+  PureModelContainer,
+  createPureModelContainer,
 } from '@pure-model/core'
 
 const useIsomorphicLayoutEffect =
@@ -43,17 +44,20 @@ export type ReactModel<I extends Initializer = any> = {
     model?: Model<InitializerState<I>>
     context?: ModelContextValue
     preloadedState?: InitializerState<I>
+    container?: PureModelContainer
     fallback?: React.ReactNode
   }>
   preload: (
     context?: ModelContextValue,
     preloadedState?: InitializerState<I>,
+    container?: PureModelContainer,
   ) => Promise<{
     Provider: React.FC
     state: InitializerState<I>
     model: Model<InitializerState<I>>
   }>
   create: I
+  initializer: I
 }
 
 export type ReactModelInitializer<RM extends ReactModel> = RM extends ReactModel<infer I> ? I : never
@@ -173,11 +177,11 @@ export const createReactModel = <I extends Initializer>(initializer: I): ReactMo
   }
 
   let Provider: ReactModel<I>['Provider'] = (props) => {
-    let { children, context, preloadedState } = props
+    let { children, context, preloadedState, container } = props
 
     let model = useMemo(() => {
       if (props.model) return props.model
-      let options = { context, preloadedState }
+      let options = { context, preloadedState, container }
       return createPureModel(initializer, options)
     }, [])
 
@@ -219,8 +223,8 @@ export const createReactModel = <I extends Initializer>(initializer: I): ReactMo
     return <ReactContext.Provider value={value as Value}>{children}</ReactContext.Provider>
   }
 
-  let preload: ReactModel<I>['preload'] = async (context, preloadedState) => {
-    let model = createPureModel(initializer, { context, preloadedState })
+  let preload: ReactModel<I>['preload'] = async (context, preloadedState, container) => {
+    let model = createPureModel(initializer, { context, preloadedState, container })
 
     await model.preload()
 
@@ -244,6 +248,7 @@ export const createReactModel = <I extends Initializer>(initializer: I): ReactMo
     Provider,
     preload,
     create: initializer,
+    initializer,
   }
 }
 
@@ -261,15 +266,16 @@ export type ProviderProps = {
   list: ReactModelArgs[]
   children: React.ReactNode
   fallback?: React.ReactNode
+  container?: PureModelContainer
 }
 
-export const Provider = ({ list, children, fallback }: ProviderProps) => {
+export const Provider = ({ list, children, fallback, container }: ProviderProps) => {
   let [state, setState] = useReactState<{ Provider: React.FC } | null>(null)
 
   useIsomorphicLayoutEffect(() => {
     let isUnmounted = false
 
-    preload(list).then((result) => {
+    preload(list, container).then((result) => {
       if (isUnmounted) return
       setState({
         Provider: result.Provider,
@@ -290,10 +296,24 @@ export const Provider = ({ list, children, fallback }: ProviderProps) => {
 
 export type HydrateProviderProps = ProviderProps
 
-export const HydrateProvider = ({ list, children, fallback }: HydrateProviderProps) => {
+export const HydrateProvider = ({
+  list,
+  children,
+  fallback,
+  container = createPureModelContainer(),
+}: HydrateProviderProps) => {
   for (const item of list) {
+    container.set(item.Model, {
+      context: item.context,
+      preloadedState: item.preloadedState,
+    })
     children = (
-      <item.Model.Provider context={item.context} preloadedState={item.preloadedState as any} fallback={fallback}>
+      <item.Model.Provider
+        context={item.context}
+        preloadedState={item.preloadedState as any}
+        container={container}
+        fallback={fallback}
+      >
         {children}
       </item.Model.Provider>
     )
@@ -310,11 +330,20 @@ type PreloadResultType<T extends ReactModelArgs[]> = Promise<{
   modelList: Model[]
 }>
 
-export const preload = async <T extends ReactModelArgs[]>(list: T) => {
+export const preload = async <T extends ReactModelArgs[]>(list: T, container?: PureModelContainer) => {
+  container = container ?? createPureModelContainer()
+
+  for (const item of list) {
+    container.set(item.Model, {
+      context: item.context,
+      preloadedState: item.preloadedState,
+    })
+  }
+
   let resultList = await Promise.all(
     list.map((item) => {
       let { Model, context, preloadedState } = item
-      return Model.preload(context, preloadedState)
+      return Model.preload(context, preloadedState, container)
     }),
   )
 

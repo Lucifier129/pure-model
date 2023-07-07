@@ -170,6 +170,7 @@ export type PresetHooks = {
   setupStartCallback: (callback: Callback) => void
   setupFinishCallback: (callback: Callback) => void
   setupPreloadCallback: (callback: Callback) => void
+  setupModel: <I extends Initializer>(Model: PureModelContainerKey<I>) => PureModel<I>
 }
 
 let { run, hooks } = createHooks<PresetHooks>({
@@ -188,9 +189,19 @@ let { run, hooks } = createHooks<PresetHooks>({
   setupPreloadCallback() {
     throw new Error(`setupPreloadCallback can't not be called after initializing`)
   },
+  setupModel() {
+    throw new Error(`setupModel can't not be called after initializing`)
+  },
 })
 
-export const { setupStore, setupContext, setupStartCallback, setupFinishCallback, setupPreloadCallback } = hooks
+export const {
+  setupStore,
+  setupContext,
+  setupStartCallback,
+  setupFinishCallback,
+  setupPreloadCallback,
+  setupModel,
+} = hooks
 
 const createInternalStore = <S, RS extends Reducers<S>>(options: CreateInternalStoreOptions<S, RS>) => {
   let { reducers, initialState, preloadedState } = options
@@ -315,10 +326,7 @@ const publish = (callbackList: CallbackList) => {
   return resultList
 }
 
-let uid = 0
-
 const createCallbackManager = () => {
-  let id = uid++
   let isPreloaded = false
   let isStarted = false
   let isFinished = false
@@ -391,20 +399,17 @@ const createCallbackManager = () => {
     }
   }
 
-  let preload = async <T>(): Promise<T[]> => {
+  let preload = async <T>(): Promise<void> => {
     if (isPreloaded || !preloadCallbackList.length) {
       isPreloaded = true
-      return []
+      return
     }
 
     let list = preloadCallbackList
     preloadCallbackList = []
 
-    let resultList = await Promise.all(publish(list))
-
+    await Promise.all(publish(list))
     isPreloaded = true
-
-    return (resultList as unknown) as T[]
   }
 
   let clearPreloadCallbackList = () => {
@@ -432,24 +437,139 @@ const createCallbackManager = () => {
   }
 }
 
-export type CreatePureModelOptions<I extends Initializer> = {
+export type CallbackManager = ReturnType<typeof createCallbackManager>
+
+export type PureModel<I extends Initializer = Initializer> = ReturnType<I> & {
+  initializer: I
+  preload: <T>() => Promise<void>
+  start: () => void
+  finish: () => void
+  addPreloadCallback: (preloadCallback: Callback) => void
+  addStartCallback: (startCallback: Callback) => void
+  addFinishCallback: (finishCallback: Callback) => void
+  isPreloaded: () => boolean
+  isStarted: () => boolean
+  isFinished: () => boolean
+}
+
+export type AnyPureModel = PureModel<Initializer>
+
+export type PureModelContainerKey<I extends Initializer> =
+  | I
+  | {
+      initializer: I
+    }
+
+export type PureModelContainerValue<I extends Initializer = Initializer> = {
   preloadedState?: PreloadedState<InitializerState<I>>
+  context?: ModelContextValue
+  model?: AnyPureModel
+}
+
+export type PureModelContainerStore = WeakMap<Initializer, PureModelContainerValue>
+
+export type PureModelContainer = {
+  get: <I extends Initializer>(key: PureModelContainerKey<I>) => PureModelContainerValue<I> | undefined
+  set: <I extends Initializer>(key: PureModelContainerKey<I>, value: PureModelContainerValue<I>) => void
+  getModel: <I extends Initializer>(key: PureModelContainerKey<I>) => PureModel<I>
+}
+
+export type PureModelContainerOptions = {
   context?: ModelContextValue
 }
 
-export const createPureModel = <I extends Initializer>(initializer: I, options: CreatePureModelOptions<I> = {}) => {
-  let {
-    preload,
-    addPreloadCallback,
-    isPreloaded,
-    start,
-    addStartCallback,
-    isStarted,
-    finish,
-    addFinishCallback,
-    isFinished,
-    clearPreloadCallbackList,
-  } = createCallbackManager()
+export const createPureModelContainer = () => {
+  let store: PureModelContainerStore = new WeakMap()
+
+  let getInitializer = <I extends Initializer>(key: PureModelContainerKey<I>): I => {
+    return 'initializer' in key ? key.initializer : key
+  }
+
+  let get: PureModelContainer['get'] = (key) => {
+    return store.get(getInitializer(key)) as any
+  }
+
+  let set: PureModelContainer['set'] = (key, value) => {
+    store.set(getInitializer(key), value)
+  }
+
+  let getModel = <I extends Initializer>(key: PureModelContainerKey<I>): PureModel<I> => {
+    let initializer = getInitializer(key)
+    let containerValue = get(initializer)
+
+    if (containerValue) {
+      if (containerValue.model) {
+        return containerValue.model as PureModel<I>
+      }
+
+      const model = createPureModel(initializer, {
+        // @ts-ignore
+        preloadedState: containerValue.preloadedState,
+        context: containerValue.context,
+        container: container,
+      })
+
+      containerValue.model = model
+
+      return model
+    }
+
+    let model = createPureModel(initializer, {
+      container: container,
+    })
+
+    store.set(initializer, {
+      model,
+    })
+
+    return model
+  }
+
+  const container: PureModelContainer = {
+    get,
+    set,
+    getModel,
+  }
+
+  return container
+}
+
+export type CreatePureModelOptions<I extends Initializer> = {
+  preloadedState?: PreloadedState<InitializerState<I>>
+  context?: ModelContextValue
+  container?: PureModelContainer
+}
+
+export const createPureModel = <I extends Initializer>(
+  initializer: I,
+  options: CreatePureModelOptions<I> = {},
+): PureModel<I> => {
+  let container: PureModelContainer = options.container ?? createPureModelContainer()
+
+  let selfContainerValue = container.get(initializer)
+
+  if (selfContainerValue) {
+    if (selfContainerValue.model) {
+      return selfContainerValue.model as PureModel<I>
+    }
+    options = {
+      ...options,
+      context: selfContainerValue.context ?? options.context,
+      preloadedState: selfContainerValue.preloadedState ?? options.preloadedState,
+    }
+  }
+
+  let callbackManager = createCallbackManager()
+
+  let upstreamModelSet = new Set<AnyPureModel>()
+
+  let setupModel = <I extends Initializer<any>>(Model: PureModelContainerKey<I>): PureModel<I> => {
+    let model = container.getModel(Model)
+
+    upstreamModelSet.add(model)
+
+    return model
+  }
 
   let setupContext = ((ctx: ModelContext) => {
     if (options.context) {
@@ -482,9 +602,10 @@ export const createPureModel = <I extends Initializer>(initializer: I, options: 
   let implementations = {
     setupStore: setupStore,
     setupContext: setupContext,
-    setupPreloadCallback: addPreloadCallback,
-    setupStartCallback: addStartCallback,
-    setupFinishCallback: addFinishCallback,
+    setupPreloadCallback: callbackManager.addPreloadCallback,
+    setupStartCallback: callbackManager.addStartCallback,
+    setupFinishCallback: callbackManager.addFinishCallback,
+    setupModel: setupModel,
   }
 
   let result = run(() => {
@@ -509,21 +630,44 @@ export const createPureModel = <I extends Initializer>(initializer: I, options: 
 
   // ignore preload callbacks if preloadedState was received
   if (options.preloadedState !== undefined) {
-    clearPreloadCallbackList()
+    callbackManager.clearPreloadCallbackList()
   }
 
-  return {
-    ...result,
-    preload,
-    start,
-    finish,
-    addPreloadCallback,
-    addStartCallback,
-    addFinishCallback,
-    isPreloaded,
-    isStarted,
-    isFinished,
+  const preload = async () => {
+    let models = [] as AnyPureModel[]
+
+    for (let model of upstreamModelSet) {
+      models.push(model)
+    }
+
+    await Promise.all(models.map((model) => model.preload()))
+
+    return callbackManager.preload()
   }
+
+  const model = {
+    ...result,
+    initializer,
+    preload,
+    start: callbackManager.start,
+    finish: callbackManager.finish,
+    addPreloadCallback: callbackManager.addPreloadCallback,
+    addStartCallback: callbackManager.addStartCallback,
+    addFinishCallback: callbackManager.addFinishCallback,
+    isPreloaded: callbackManager.isPreloaded,
+    isStarted: callbackManager.isStarted,
+    isFinished: callbackManager.isFinished,
+  }
+
+  if (selfContainerValue) {
+    selfContainerValue.model = model
+  } else {
+    container.set(initializer, {
+      model,
+    })
+  }
+
+  return model
 }
 
 export type Model<S = any> = {
