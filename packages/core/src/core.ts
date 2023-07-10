@@ -400,17 +400,25 @@ const createCallbackManager = () => {
     }
   }
 
-  let preload = async <T>(): Promise<void> => {
+  let preloadingPromise: Promise<void> | null = null
+
+  let preload = (): Promise<void> => {
+    if (preloadingPromise) {
+      return preloadingPromise
+    }
+
     if (isPreloaded || !preloadCallbackList.length) {
       isPreloaded = true
-      return
+      return Promise.resolve()
     }
 
     let list = preloadCallbackList
     preloadCallbackList = []
 
-    await Promise.all(publish(list))
+    preloadingPromise = Promise.all(publish(list)).then(() => {})
     isPreloaded = true
+
+    return preloadingPromise
   }
 
   let clearPreloadCallbackList = () => {

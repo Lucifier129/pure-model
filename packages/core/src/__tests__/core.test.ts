@@ -338,6 +338,7 @@ describe('pure-model', () => {
   })
 
   it('support setupModel to access another models', async () => {
+    let delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     let TestContext = createModelContext(0)
 
     function counter0() {
@@ -345,7 +346,8 @@ describe('pure-model', () => {
 
       let testContext = setupContext(TestContext)
 
-      setupPreloadCallback(() => {
+      setupPreloadCallback(async () => {
+        await delay(20)
         actions.increBy(10 + testContext)
       })
 
@@ -360,7 +362,8 @@ describe('pure-model', () => {
 
       let testContext = setupContext(TestContext)
 
-      setupPreloadCallback(() => {
+      setupPreloadCallback(async () => {
+        await delay(10)
         actions.increBy(20 + testContext)
       })
 
@@ -436,6 +439,7 @@ describe('pure-model', () => {
       context: TestContext.create(4),
     })
 
+    counter0Model.preload()
     await counter2Model.preload()
 
     expect(counter0Model.isPreloaded()).toEqual(true)
