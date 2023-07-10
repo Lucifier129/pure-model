@@ -44,6 +44,7 @@ npm install --save @pure-model/core @pure-model/react @pure-model/next.js @pure-
   - [基础 API](#基础-api)
     - [createPureModel](#createpuremodelinitializer-options)
     - [setupStore](#setupstore-name-initialstate-reducers-devtools-logger-)
+    - [setupModel](<#setupmodel(model)>)
     - [createModelContext](#createmodelcontextinitialvalue-setupcontextmodelcontext-mergemodelcontextmodelcontxtvalue)
     - [setupPreloadCallback](#setuppreloadcallbacklistener)
     - [setupStartCallback](#setupstartcallbacklistener)
@@ -584,6 +585,70 @@ let model = createPureModel(() => {
       asyncIncreBy2,
       group,
     },
+  }
+})
+```
+
+#### setupModel(Model)
+
+从 `1.3` 版本开始，支持通过 `setupModel` 访问另一个 `Model` 的实例。
+
+被访问者角色的 `Model` 的 `setupPreloadCallback` 将先于访问者角色的 `Model` 的 `setupPreloadCallback` 调用，因此可以在 `setupPreloadCallback` 中通过 `model.store.getState()` 访问到已预加载的数据。
+
+```ts
+import { setupModel, setupStore, setupPreloadCallback, createPureModel } from '@pure-model/core'
+
+/**
+ * 通用 Model
+ */
+const CommonModel = createPureModel(() => {
+  const { store, actions } = setupStore({
+    initialState: {
+      isApp: false,
+      isProd: false,
+    },
+    reducers: {
+      update: (state, newState) => {
+        return {
+          ...state,
+          ...newState,
+        }
+      },
+    },
+  })
+
+  setupPreloadCallback(async () => {
+    actions.update({
+      isProd: true,
+    })
+  })
+
+  return {
+    store,
+    actions,
+  }
+})
+
+const CounterModel = createPureModel(() => {
+  const { store, actions } = setupStore({
+    initialState: 0,
+    reducers: {
+      setCount: (_, newCount) => count,
+    },
+  })
+
+  const commonModel = setupModel(CommonModel)
+
+  setupPreloadCallback(async () => {
+    const commonModelState = commonModel.store.getState()
+    if (commonModelState.isProd) {
+      // do something
+    }
+  })
+
+  return {
+    store,
+    actions,
   }
 })
 ```
