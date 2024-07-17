@@ -67,9 +67,9 @@ export const setupCancel = <T extends AsyncFunction>(task: T, options: Partial<C
 
     try {
       result = task(...(args as any))
-    } catch (error) {
+    } catch (error: unknown) {
       hasError = true
-      handleError(error)
+      handleError(error instanceof Error ? error : new Error('Unknown error'))
     }
 
     if (hasError) {

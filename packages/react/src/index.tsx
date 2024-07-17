@@ -26,10 +26,10 @@ import {
 const useIsomorphicLayoutEffect =
   // tslint:disable-next-line: strict-type-predicates
   typeof window !== 'undefined' &&
-  // tslint:disable-next-line: strict-type-predicates
-  typeof window.document !== 'undefined' &&
-  // tslint:disable-next-line: deprecation & strict-type-predicates
-  typeof window.document.createElement !== 'undefined'
+    // tslint:disable-next-line: strict-type-predicates
+    typeof window.document !== 'undefined' &&
+    // tslint:disable-next-line: deprecation & strict-type-predicates
+    typeof window.document.createElement !== 'undefined'
     ? useLayoutEffect
     : useEffect
 
@@ -303,7 +303,9 @@ export const HydrateProvider = ({
   container = createPureModelContainer(),
 }: HydrateProviderProps) => {
   for (const item of list) {
+    const contextValue = container.get(item.Model)
     container.set(item.Model, {
+      ...contextValue,
       context: item.context,
       preloadedState: item.preloadedState,
     })
@@ -334,7 +336,9 @@ export const preload = async <T extends ReactModelArgs[]>(list: T, container?: P
   container = container ?? createPureModelContainer()
 
   for (const item of list) {
+    const contextValue = container.get(item.Model)
     container.set(item.Model, {
+      ...contextValue,
       context: item.context,
       preloadedState: item.preloadedState,
     })

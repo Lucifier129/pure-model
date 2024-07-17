@@ -259,10 +259,11 @@ const createReduxDevtoolsEnhancer = (devtools: boolean = true, name?: string, en
     // tslint:disable-next-line: strict-type-predicates
     devtools && typeof window === 'object' && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-          name,
-        })
+        name,
+      })
       : compose
 
+  // @ts-ignore
   let enhancer = enableLogger ? composeEnhancers(applyMiddleware(createLogger())) : composeEnhancers()
 
   return enhancer
@@ -415,7 +416,7 @@ const createCallbackManager = () => {
     let list = preloadCallbackList
     preloadCallbackList = []
 
-    preloadingPromise = Promise.all(publish(list)).then(() => {})
+    preloadingPromise = Promise.all(publish(list)).then(() => { })
     isPreloaded = true
 
     return preloadingPromise
@@ -466,8 +467,8 @@ export type AnyPureModel = PureModel<Initializer>
 export type PureModelContainerKey<I extends Initializer> =
   | I
   | {
-      initializer: I
-    }
+    initializer: I
+  }
 
 export type PureModelContainerValue<I extends Initializer = Initializer> = {
   preloadedState?: PreloadedState<InitializerState<I>>
